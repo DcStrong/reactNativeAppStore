@@ -1,9 +1,13 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { View, Text, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
+import { StyleSheet, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import * as utils from "../utils/index";
+import * as actions from "../store/index";
 
 import Store from './Store';
 import Basket from './Basket';
@@ -13,6 +17,14 @@ const Navigation = () => {
 
   const BasketStack = createStackNavigator();
   const Tab = createMaterialBottomTabNavigator();
+  const basket = useSelector(state => state.basket);
+
+  utils
+    .asyncStorageGetWrapper("@itemBasket")
+    .then((value) => {
+      dispatch(actions.restoreBasketFromLocalStorage(JSON.parse(value)));
+    })
+    .catch((e) => console.log(e, "erorr"));
 
   function BasketStackScreen() {
     return (
@@ -30,13 +42,16 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      <Tab.Navigator>
+      <Tab.Navigator barStyle={{backgroundColor: '#fff'}}>
         <Tab.Screen
           name="Store"
           component={Store}
           options={{
             title: "Магазин",
-            tabBarLabel: "Магазин"
+            tabBarLabel: "Магазин",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="home" color={color} size={26} />
+            ),
           }}
         />
         <Tab.Screen
@@ -44,7 +59,17 @@ const Navigation = () => {
           component={BasketStackScreen}
           options={{
             title: "Корзина",
-            tabBarLabel: "Корзина"
+            tabBarLabel: "Корзина",
+            tabBarIcon: ({ color }) => (
+              <View>
+                {basket.size === 0 ? null : (
+                  <View style={style.bascetCount}>
+                    <Text style={style.basketCountText}>{basket.size}</Text>
+                  </View>
+                )}
+                <MaterialCommunityIcons name="basket-fill" color={color} size={26} />
+              </View>
+            ),
           }}
         />
       </Tab.Navigator>

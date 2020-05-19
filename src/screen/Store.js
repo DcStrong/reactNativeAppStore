@@ -26,6 +26,7 @@ const Store = () => {
             <Product
             id={item}
             name={products.get(item).name}
+            img={products.get(item).img}
             buttonTitle={basket.get(item) ? 'Убрать' : 'Добавить'}
             price={products.get(item).price}
             addToBasket={onAddToBasket}
